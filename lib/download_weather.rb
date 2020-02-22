@@ -1,30 +1,14 @@
 # These functions make use of the OpenWeather API
 # the end goal is to return current temp, RH, windspeed and cloud-cover info
-# search by lat/long coordinates or by city name
+# search by lat/long coordinates or by city id
 
 # imports
 require 'json'
 require 'open-uri'
 require 'pry-byebug'
 
-OW_API_KEY = "e81081459c34b9d603d524e60453dedf"
-OW_BASE_URL = "http://api.openweathermap.org/data"
-CITIES = JSON.parse(File.read('city_data_hash.json'), symbolize_names: true)
-
-def find_city(country="", city="")
-  # assume country code is right
-  cities = CITIES[country.to_sym]
-  # find possible matches for city name (case insensitive)
-  matches = cities.keys.select do |name|
-    name.to_s.downcase =~ /.*#{city.downcase}.*/
-  end
-  # return the city data (as array of hashes) for all matches
-  data = []
-  matches.each do |match|
-    cities[match].each { |entry| data << entry.merge({ name: match.to_s }) }
-  end
-  data
-end
+OW_API_KEY = 'e81081459c34b9d603d524e60453dedf'.freeze
+OW_BASE_URL = 'http://api.openweathermap.org/data'.freeze
 
 def format_response(data = {})
   data[:weather]
@@ -32,8 +16,16 @@ end
 
 def download_current_by_city(args = {})
   return [] if args[:id].nil?
+
+  # build url
   url = "#{OW_BASE_URL}/2.5/weather?id=#{args[:id]}&appid=#{OW_API_KEY}"
-  data = JSON.parse(URI.open(url).read, symbolize_names: true)
+
+  # query API and return JSON
+  serialised_data = URI.open(url).read
+  data = JSON.parse(serialised_data, symbolize_names: true)
+
+  # format data before returning
+  format_response(data)
 end
 
 def download_forecast_by_city(args = {})
@@ -48,14 +40,11 @@ def download_forecast_by_loc(args = {})
 
 end
 
-
-
-
-
 # tests
-chc_stns = find_city("NZ", "Christchurch")
-ash_stns = find_city("NZ", "ashburton")
-
-chc_current = download_current_by_city(chc_stns.first)
-p chc_stns.first
+chc_stn = { id: 7_910_036,
+            lon: 172.745865,
+            lat: -43.645779,
+            name: 'Christchurch City' }
+chc_current = download_current_by_city(chc_stn)
+p chc_stn
 p chc_current
