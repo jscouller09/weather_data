@@ -4,7 +4,6 @@ require 'pry-byebug'
 
 # read city list info downloaded from => http://bulk.openweathermap.org/sample/
 CITY_INFO = JSON.parse(File.read('data/city.list.json'))
-
 # organise city data as hash: country => city => [{ relevant_data }]
 # some cities have multiple ids at different coordinates
 # therefore arrays under each city have >= 1 entry

@@ -6,6 +6,7 @@
 require 'json'
 require 'open-uri'
 require 'pry-byebug'
+#require_relative '..'
 
 OW_API_KEY = 'e81081459c34b9d603d524e60453dedf'.freeze
 OW_BASE_URL = 'http://api.openweathermap.org/data'.freeze
@@ -28,23 +29,8 @@ def download_current_by_city(args = {})
   format_response(data)
 end
 
-def download_forecast_by_city(args = {})
-
-end
-
-def download_current_by_loc(args = {})
-
-end
-
-def download_forecast_by_loc(args = {})
-
-end
-
 # tests
-chc_stn = { id: 7_910_036,
-            lon: 172.745865,
-            lat: -43.645779,
-            name: 'Christchurch City' }
+chc_stn = { id: 7_910_036, lon: 172.745865, lat: -43.645779, name: 'Christchurch City', country: 'NZ' }
 chc_current = download_current_by_city(chc_stn)
 p chc_stn
 p chc_current

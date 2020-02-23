@@ -31,7 +31,7 @@ db_namespace = namespace :db do
 
   desc 'migrate the database (options: VERSION=x).'
   task :migrate do
-    require_relative '../../utils'
+    require_relative 'config/utils'
     FullStackChallengesUtils.rake_migrate(db_namespace, File.dirname(__FILE__))
   end
 

@@ -1,11 +1,11 @@
 require 'json'
 
-CITIES = JSON.parse(File.read('data/city_data_hash.json'),
-                    symbolize_names: true)
+COUNTRIES = JSON.parse(File.read('data/city_data_hash.json'),
+                       symbolize_names: true)
 
 def find_city(country = '', city = '')
   # assume country code is right
-  cities = CITIES[country.to_sym]
+  cities = COUNTRIES[country.to_sym]
   # find possible matches for city name (case insensitive)
   matches = cities.keys.select do |name|
     name.to_s.downcase =~ /.*#{city.downcase}.*/
