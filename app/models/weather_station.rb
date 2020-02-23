@@ -13,7 +13,8 @@ class WeatherStation < ActiveRecord::Base
 
   def download_current_data
     # build url
-    url = "#{OW_BASE_URL}/2.5/weather?id=#{args[:id]}&appid=#{OW_API_KEY}&units=metric"
+    url = "#{OW_BASE_URL}/2.5/weather?"
+    url += "id=#{args[:id]}&appid=#{OW_API_KEY}&units=metric"
     # query API and return JSON
     serialised_data = URI.open(url).read
     data = JSON.parse(serialised_data, symbolize_names: true)
