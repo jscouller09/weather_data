@@ -1,5 +1,3 @@
-
-
 class WeatherStation < ActiveRecord::Base
   validates :name, presence: true
   validates :country, presence: true, format: { with: /[A-Z]{2}/ }
@@ -12,24 +10,14 @@ class WeatherStation < ActiveRecord::Base
 
   OW_BASE_URL = 'http://api.openweathermap.org/data'.freeze
   OW_API_KEY = 'e81081459c34b9d603d524e60453dedf'.freeze
-def a
 
-end
-
-
-  def download_current_by_city(args = {})
+  def download_current_data
     # build url
     url = "#{OW_BASE_URL}/2.5/weather?id=#{args[:id]}&appid=#{OW_API_KEY}"
-
     # query API and return JSON
     serialised_data = URI.open(url).read
     data = JSON.parse(serialised_data, symbolize_names: true)
-
     # format data before returning
     format_response(data)
   end
-
-
 end
-
-

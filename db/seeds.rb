@@ -8,14 +8,12 @@ CITY_INFO = JSON.parse(File.read('data/city.list.json'), symbolize_names: true)
 # iterate over station list and create WeatherStation instances
 invalid_stations = []
 counter = 0
-num_stations = CITY_INFO.length()
+num_stations = CITY_INFO.length
 CITY_INFO.each do |station|
   station.merge!(station[:coord])
   station.delete(:coord)
   new_station = WeatherStation.new(station)
-  unless new_station.save
-    invalid_stations << station
-  end
+  invalid_stations << station unless new_station.save
   counter += 1
   progress = counter.fdiv(num_stations) * 100.0
   puts "#{progress.round(2)}\% complete"
