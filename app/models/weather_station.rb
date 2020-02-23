@@ -79,26 +79,45 @@ class WeatherStation < ActiveRecord::Base
     802 => { main: 'Clouds', description: 'overcast clouds (85-100%)', icon: ['04d', '04n'] },
   }
 
-  def download_current_data
+  def download_current_weather
     # build url
     url = "#{OW_BASE_URL}/2.5/weather?"
     url += "id=#{id}&appid=#{OW_API_KEY}&units=metric"
-    # query API and return JSON
-    serialised_data = URI.open(url).read
-    data = JSON.parse(serialised_data, symbolize_names: true)
-    # format data before returning
-    format_response(data)
+    # send query and format data
+    format_response(send_query(url))
+  end
+
+  def download_3hrly_5d_forecast
+    # build url
+    url = "#{OW_BASE_URL}/2.5/forecast?"
+    url += "id=#{id}&appid=#{OW_API_KEY}&units=metric"
+    # send query
+    data = send_query(url)
+    # format responses
+    forecast = data[:list].map do |timestep|
+      timestep[:timezone] = data[:city][:timezone]
+      format_response(timestep)
+    end
+    forecast
   end
 
   private
 
+  def send_query(url)
+    # query API and return JSON
+    serialised_data = URI.open(url).read
+    JSON.parse(serialised_data, symbolize_names: true)
+  end
+
   def format_response(data = {})
-    timestamp = DateTime.strptime(data[:dt].to_s,'%s')
     data_to_keep = {}
-    data_to_keep[:dt_UTC] = data[:dt]
-    data_to_keep[:timestamp_UTC] = data[:sys][:dt_txt].nil? ? timestamp.strftime("%Y-%m-%d %H:%M:%S") : data[:sys][:dt_txt]
-    data_to_keep[:sunrise] = data[:sys][:sunrise]
-    data_to_keep[:sunset] = data[:sys][:sunset]
+    tz = data[:timezone]
+    unless data[:sys][:sunrise].nil?
+      data_to_keep[:sunrise] = DateTime.strptime((data[:sys][:sunrise] + tz).to_s,'%s')
+      data_to_keep[:sunset] = DateTime.strptime((data[:sys][:sunset] + tz).to_s,'%s')
+    end
+    data_to_keep[:timestamp] = DateTime.strptime((data[:dt] + tz).to_s,'%s')
+    data_to_keep[:timezone_UTC_offset] = DateTime.strptime(tz.to_s,'%s').strftime("#{tz.negative? ? '-' : '+'}%H%M")
     data_to_keep[:temp_c] = data[:main][:temp]
     data_to_keep[:humidity_perc] = data[:main][:humidity]
     data_to_keep[:pressure_hPa] = data[:main][:pressure]
@@ -109,10 +128,14 @@ class WeatherStation < ActiveRecord::Base
     data_to_keep[:main] = data[:weather].first[:main]
     data_to_keep[:description] = data[:weather].first[:description]
     data_to_keep[:icon] = data[:weather].first[:icon]
-    data_to_keep[:rain_1h_mm] = data[:rain].nil? ? nil : data[:rain][:"1h"]
-    data_to_keep[:rain_3h_mm] = data[:rain].nil? ? nil : data[:rain][:"3h"]
-    data_to_keep[:snow_1h_mm] = data[:snow].nil? ? nil : data[:snow][:"1h"]
-    data_to_keep[:snow_3h_mm] = data[:snow].nil? ? nil : data[:snow][:"3h"]
+    unless data[:rain].nil?
+      data_to_keep[:rain_1h_mm] = data[:rain][:"1h"]
+      data_to_keep[:rain_3h_mm] = data[:rain][:"3h"]
+    end
+    unless data[:snow].nil?
+      data_to_keep[:snow_1h_mm] =  data[:snow][:"1h"]
+      data_to_keep[:snow_3h_mm] = data[:snow][:"3h"]
+    end
     data_to_keep
   end
 end
