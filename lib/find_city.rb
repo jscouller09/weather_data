@@ -20,4 +20,11 @@ end
 
 # tests
 p find_city('NZ', 'Christchurch')
+puts
 p find_city('NZ', 'ashburton')
+puts
+p find_city('CA', 'montreal')
+puts
+p find_city('GB', 'london')
+puts
+p find_city('CA', 'toronto')
