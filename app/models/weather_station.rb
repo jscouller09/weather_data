@@ -14,7 +14,7 @@ class WeatherStation < ActiveRecord::Base
                             less_than_or_equal_to: 180 }
 
   OW_BASE_URL = 'http://api.openweathermap.org/data'.freeze
-  OW_API_KEY = 'e81081459c34b9d603d524e60453dedf'.freeze
+  OW_API_KEY = ''.freeze
 
   WEATHER_CODES = {
     200 => { main: 'Thunderstorm', description: 'thunderstorm with light rain', icon: '11d' },

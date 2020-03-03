@@ -7,7 +7,7 @@ require 'json'
 require 'open-uri'
 require 'pry-byebug'
 
-OW_API_KEY = 'e81081459c34b9d603d524e60453dedf'.freeze
+OW_API_KEY = ''.freeze
 OW_BASE_URL = 'http://api.openweathermap.org/data'.freeze
 
 def format_response(data = {})
